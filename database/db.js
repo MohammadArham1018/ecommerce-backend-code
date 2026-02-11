@@ -1,23 +1,23 @@
 import { config } from 'dotenv';
 import pkg from 'pg';
-const { Client } = pkg;
 
 config();
 
-const database = new Client({
+const { Pool } = pkg;
+
+const database = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
   },
 });
 
-try{
-    await database.connect();
-    console.log("Database connected successfully");
+database.on("connect", () => {
+  console.log("DB Connected");
+});
 
-} catch(error){
-    console.error("Database connection failed:", error);
-    process.exit(1);
-}
+database.on("error", (err) => {
+  console.error("Unexpected DB error", err);
+});
 
 export default database;
